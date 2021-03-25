@@ -116,6 +116,8 @@ static char rx_rst[8] = "RXRST";
 static char tx_rst[8] = "TXRST";
 static char rx_dio0[8] = "RXDIO0";
 static char tx_dio0[8] = "TXDIO0";
+static char rx_led[8] = "RXLED";
+static char tx_led[8] = "TXLED";
 static char logdebug[4] = "DEB";          /* debug info option */
 static char server_type[16] = "server_type";          /* debug info option */
 static char radio_mode[8] = "mode";          /* debug info option */
@@ -677,6 +679,12 @@ int main(int argc, char *argv[])
         strcpy(rx_dio0, "6");
         MSG_LOG(DEBUG_UCI, "UCIINFO~ get option rx_dio0=%s\n", rx_dio0);
     }
+
+    if (!get_config("radio2", rx_led, 8)){
+        strcpy(rx_led, "24");
+        MSG_LOG(DEBUG_UCI, "UCIINFO~ get option rx_led=%s\n", rx_led);
+    }
+
 /* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
 
     if (!get_config("radio2", tx_freq, 16)){
@@ -723,6 +731,11 @@ int main(int argc, char *argv[])
     if (!get_config("radio2", tx_dio0, 8)){
         strcpy(tx_dio0, "29");
         MSG_LOG(DEBUG_UCI, "UCIINFO~ get option tx_dio0=%s\n", tx_dio0);
+    }
+
+    if (!get_config("radio2", tx_led, 8)){
+        strcpy(tx_led, "25");
+        MSG_LOG(DEBUG_UCI, "UCIINFO~ get option tx_led=%s\n", tx_led);
     }
 
     switch (atoi(logdebug)) {
@@ -876,9 +889,11 @@ int main(int argc, char *argv[])
 	pinMode(rxdev->nss, OUTPUT);
 	pinMode(rxdev->rst, OUTPUT);
 	pinMode(rxdev->dio[0], INPUT);
+	pinMode(atoi(rx_led), OUTPUT);
 	pinMode(txdev->nss, OUTPUT);
 	pinMode(txdev->rst, OUTPUT);
 	pinMode(txdev->dio[0], INPUT);
+	pinMode(atoi(tx_led), OUTPUT);
 
 /* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
 
@@ -1055,6 +1070,9 @@ int main(int argc, char *argv[])
                  push_mqtt(&pktrx);
             }
             pktrx_clean(&pktrx);
+            digitalWrite(atoi(rx_led), HIGH);
+            wait_ms(100);
+            digitalWrite(atoi(rx_led), LOW);
         } else if ((long)now_time - (long)rxlora_time > KEEPALIVE_REC) { 
             rxlora_time = now_time;
             rxlora(rxdev, RXMODE_SCAN);  /* reset lora continue receive mode */
@@ -1881,6 +1899,9 @@ void thread_jit(void) {
                     meas_nb_tx_ok += 1;
                     pthread_mutex_unlock(&mx_meas_dw);
                     MSG_LOG(DEBUG_JIT, "INFO~ Donwlink done: count_us=%u\n", pkt.count_us);
+                    digitalWrite(atoi(tx_led), HIGH);
+                    wait_ms(100);
+                    digitalWrite(atoi(tx_led), LOW);
                 } else {
                     MSG_LOG(DEBUG_ERROR, "ERROR~ jit_dequeue failed with %d\n", jit_result);
                 }
