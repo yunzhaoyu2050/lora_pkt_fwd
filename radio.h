@@ -319,8 +319,8 @@ struct mqtt_config {
 #define READ_ACCESS     0x00
 #define WRITE_ACCESS    0x80
 #define SPI_SPEED       8000000
-#define SPI_DEV_RX    "/dev/spidev1.0"
-#define SPI_DEV_TX    "/dev/spidev2.0"
+#define SPI_DEV_RX    "/dev/spidev0.0"
+#define SPI_DEV_TX    "/dev/spidev0.1"
 
 /* log level */
 extern int DEBUG_PKT_FWD;
