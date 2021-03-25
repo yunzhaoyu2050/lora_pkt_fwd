@@ -109,6 +109,12 @@ static char rx_freq[16] = "RXFREQ";            /* rx frequency of radio */
 static char tx_freq[16] = "TXFREQ";            /* tx frequency of radio */
 static char syncwd1[8] = "RXSYNC";            /* rx frequency of radio */
 static char syncwd2[8] = "TXSYNC";           /* tx frequency of radio */
+static char rx_nss[8] = "RXNSS";
+static char tx_nss[8] = "TXNSS";
+static char rx_rst[8] = "RXRST";
+static char tx_rst[8] = "TXRST";
+static char rx_dio0[8] = "RXDIO0";
+static char tx_dio0[8] = "TXDIO0";
 static char logdebug[4] = "DEB";          /* debug info option */
 static char server_type[16] = "server_type";          /* debug info option */
 static char radio_mode[8] = "mode";          /* debug info option */
@@ -656,6 +662,20 @@ int main(int argc, char *argv[])
         MSG_LOG(DEBUG_UCI, "UCIINFO~ get option syncword=0x%02x\n", syncwd1);
     }
 
+    if (!get_config("radio1", rx_nss, 8)){
+        strcpy(rx_nss, "10");
+        MSG_LOG(DEBUG_UCI, "UCIINFO~ get option rx_nss=%s\n", rx_nss);
+    }
+
+    if (!get_config("radio1", rx_rst, 8)){
+        strcpy(rx_rst, "5");
+        MSG_LOG(DEBUG_UCI, "UCIINFO~ get option rx_rst=%s\n", rx_rst);
+    }
+
+    if (!get_config("radio1", rx_dio0, 8)){
+        strcpy(rx_dio0, "6");
+        MSG_LOG(DEBUG_UCI, "UCIINFO~ get option rx_dio0=%s\n", rx_dio0);
+    }
 /* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
 
     if (!get_config("radio2", tx_freq, 16)){
@@ -686,6 +706,22 @@ int main(int argc, char *argv[])
     if (!get_config("radio2", syncwd2, 8)){
         strcpy(syncwd2, "52");  //Value 0x34 is reserved for LoRaWAN networks
         MSG_LOG(DEBUG_UCI, "UCIINFO~ get option syncword2=0x%02x\n", syncwd2);
+
+    }
+
+	if (!get_config("radio2", tx_nss, 8)){
+        strcpy(tx_nss, "11");
+        MSG_LOG(DEBUG_UCI, "UCIINFO~ get option tx_nss=%s\n", tx_nss);
+    }
+
+    if (!get_config("radio2", tx_rst, 8)){
+        strcpy(tx_rst, "5");
+        MSG_LOG(DEBUG_UCI, "UCIINFO~ get option tx_rst=%s\n", tx_rst);
+    }
+
+    if (!get_config("radio2", tx_dio0, 8)){
+        strcpy(tx_dio0, "29");
+        MSG_LOG(DEBUG_UCI, "UCIINFO~ get option tx_dio0=%s\n", tx_dio0);
     }
 
     switch (atoi(logdebug)) {
@@ -778,10 +814,10 @@ int main(int argc, char *argv[])
 
     txdev = (radiodev *) malloc(sizeof(radiodev));
     
-    rxdev->nss = 15;
-    rxdev->rst = 8;
-    rxdev->dio[0] = 7;
-    rxdev->dio[1] = 6;
+    rxdev->nss = atoi(rx_nss);
+    rxdev->rst = atoi(rx_rst);
+    rxdev->dio[0] = atoi(rx_dio0);
+    rxdev->dio[1] = 0;
     rxdev->dio[2] = 0;
     rxdev->spiport = lgw_spi_open(SPI_DEV_RX);
     if (rxdev->spiport < 0) { 
@@ -800,10 +836,10 @@ int main(int argc, char *argv[])
     strcpy(rxdev->desc, "Radio1");
 
 /* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
-    txdev->nss = 24;
-    txdev->rst = 23;
-    txdev->dio[0] = 22;
-    txdev->dio[1] = 20;
+    txdev->nss = atoi(tx_nss);
+    txdev->rst = atoi(tx_rst);
+    txdev->dio[0] = atoi(tx_dio0);
+    txdev->dio[1] = 0;
     txdev->dio[2] = 0;
     txdev->spiport = lgw_spi_open(SPI_DEV_TX);
     if (txdev->spiport < 0) {
