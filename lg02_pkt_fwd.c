@@ -29,6 +29,7 @@
 #include <netdb.h>		/* gai_strerror */
 
 #include <uci.h>
+#include <wiringPi.h>
 
 #include "radio.h"
 #include "jitqueue.h"
@@ -867,6 +868,17 @@ int main(int argc, char *argv[])
 
     MSG_LOG(DEBUG_INFO, "INFO~ %s struct: spiport=%d, freq=%ld, prlen=%d, sf=%d, syncwd=0x%02x, CR=4/%d, BW=%ld\n", rxdev->desc, rxdev->spiport, rxdev->freq, rxdev->prlen, rxdev->sf, rxdev->syncword,rxdev->cr,rxdev->bw);
     MSG_LOG(DEBUG_INFO, "INFO~ %s struct: spiport=%d, freq=%ld, prlen=%d, sf=%d, syncwd=0x%02x, CR=4/%d, BW=%ld\n", txdev->desc, txdev->spiport, txdev->freq, txdev->prlen, txdev->sf, txdev->syncword,txdev->cr,txdev->bw);
+
+/* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
+
+	/* Init WiringPI */
+	wiringPiSetup() ;
+	pinMode(rxdev->nss, OUTPUT);
+	pinMode(rxdev->rst, OUTPUT);
+	pinMode(rxdev->dio[0], INPUT);
+	pinMode(txdev->nss, OUTPUT);
+	pinMode(txdev->rst, OUTPUT);
+	pinMode(txdev->dio[0], INPUT);
 
 /* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
 

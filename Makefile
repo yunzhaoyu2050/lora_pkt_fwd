@@ -5,7 +5,7 @@ OBJDIR := build
 OBJS   := $(patsubst %.c,$(OBJDIR)/%.o,$(wildcard *.c))
 
 CFLAGS  +=
-LDFLAGS += -luci -lm -lpthread
+LDFLAGS += -luci -lm -lpthread -lwiringPi
 
 
 all: $(OBJDIR) $(APP)
